@@ -3,11 +3,13 @@
   const $ = (id) => document.getElementById(id);
   const say = (text, error = false) => { $('msg').textContent = text; $('msg').className = 'msg' + (error ? ' error' : ''); };
 
-  const link = Protocol.parseLink(location.hash);
+  // The link comes in the fragment. It stays in the address bar on purpose: "Add to Home Screen" and bookmarks save the
+  // address, so they keep the link. The fragment never goes to a server. A copy is kept in this browser's storage, so
+  // opening the page without the fragment (a reload of a stripped address) still works there.
+  let link = Protocol.parseLink(location.hash);
+  if (link) { try { localStorage.setItem('orgcs-status-link', JSON.stringify(link)); } catch {} }
+  else { try { const s = JSON.parse(localStorage.getItem('orgcs-status-link')); link = Protocol.parseLink(Protocol.link({ page: '', secret: s.secret, relay: s.relay, name: s.name })); } catch { link = null; } }
   if (!link) { say('This link is not valid. Open the one the browser showed you, complete.', true); return; }
-  // Keep the secret out of history and out of anything shared from this tab.
-  try { history.replaceState(null, '', location.pathname); } catch {}
-  try { localStorage.setItem('orgcs-status-link', JSON.stringify(link)); } catch {}
   $('who').textContent = link.name ? `Linked as ${link.name}` : '';
 
   let busy = false;
