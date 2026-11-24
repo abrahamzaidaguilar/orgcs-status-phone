@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
   const say = (text, error = false) => { $('msg').textContent = text; $('msg').className = 'msg' + (error ? ' error' : ''); };
 
-  const link = Protocol.parseLink(location.href);
+  const link = Protocol.parseLink(location.hash);
   if (!link) { say('This link is not valid. Open the one the browser showed you, complete.', true); return; }
   // Keep the secret out of history and out of anything shared from this tab.
   try { history.replaceState(null, '', location.pathname); } catch {}
